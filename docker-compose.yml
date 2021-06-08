@@ -1,0 +1,37 @@
+version: 3.7
+
+services:
+  calendso:
+    build: .
+    container_name: calendso_container
+    volumes:
+      - $(pwd)/.env:/app/.env
+    environment:
+      NEXTAUTH_URL: https://calendar.ronaldmiranda.com.br
+      VIRTUAL_HOST: calendar.ronaldmiranda.com.br
+      VIRTUAL_PORT: 3000
+    net:
+      - rede
+      - postgres
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD_FILE=/run/secrets/postgres-passwd
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - $(pwd)/.pgpass:/run/secrets/postgres-passwd
+    expose:
+      - 5432:5432
+
+volumes:
+  pg_data:
+    driver: local
+networks:
+  postgres:
+    driver: bridge
+  rede:
+    external: true
+    name: rede
+
+
